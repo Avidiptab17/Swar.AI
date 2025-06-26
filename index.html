@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swar.AI - Indian Classical Music Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #006466 20%, #4d194d 80%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Header Navigation Styles */
+        .navbar {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .nav-links li a:hover {
+            color: #ffd700;
+            background: rgba(255,215,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-links li a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #ffd700;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links li a:hover::after {
+            width: 80%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin: 40px 0;
+            animation: fadeInDown 1s ease-out 0.2s both;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: #ffb703;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            color: #FFD700;
+            font-weight: 300;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .music-generator {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeInLeft 1s ease-out 0.4s both;
+        }
+
+        .chat-section {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: fadeInRight 1s ease-out 0.4s both;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #FFD700;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            border-color: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+        }
+
+        .form-group select option {
+            background: #333;
+            color: white;
+        }
+
+        .slider-container {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #5390d9, #4d194d);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(94, 96, 206, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #5390d9, #4d194d);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 10px rgba(94, 96, 206, 0.5);
+        }
+
+        .slider-value {
+            position: absolute;
+            right: 0;
+            top: -30px;
+            background: #fffcf2;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.8), rgba(0, 0, 0, 0.3));
+            color: #fffcf2;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 252, 242, 0.3);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .audio-player {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: #FFD700 transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #FFD700;
+            border-radius: 3px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message.bot {
+            text-align: left;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+        }
+
+        .message.bot .message-content {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .chat-send-btn {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.4);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        .error-message {
+            background: rgba(255,0,0,0.2);
+            color: #ff6b6b;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid rgba(255,0,0,0.3);
+        }
+
+        .success-message {
+            background: rgba(0,255,0,0.2);
+            color: #51cf66;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid rgba(0,255,0,0.3);
+        }
+
+        .auth-section {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .auth-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin: 0 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 3rem 0 1rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #FFD700;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #FFD700;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #FFD700;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .social-links a:hover {
+            color: #FFD700;
+            transform: translateY(-2px);
+            background: rgba(255,215,0,0.2);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(255,255,255,0.1);
+                backdrop-filter: blur(15px);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .auth-btn {
+                display: block;
+                margin: 10px 0;
+                width: 100%;
+            }
+
+            .social-links a {
+                width: 35px;
+                height: 35px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="#" class="logo">Swar.AI</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#generate">Generate</a></li>
+            <li><a href="#explore">Explore</a></li>
+            <li><a href="#learn">Learn</a></li>
+            <li><a href="#community">Community</a></li>
+        </ul>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="header">
+        <h1>Swar.AI</h1>
+        <p>Generate Beautiful Indian Classical Music with AI</p>
+    </div>
+
+    <div class="auth-section" id="authSection">
+        <p style="margin-bottom: 20px; font-size: 1.1rem;">Please login or register to generate music</p>
+        <button class="auth-btn" onclick="showLoginForm()">Login</button>
+        <button class="auth-btn" onclick="showRegisterForm()">Register</button>
+
+        <div id="loginForm" style="display: none; margin-top: 20px;">
+            <input type="text" id="loginUsername" placeholder="Username" style="margin: 5px; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9); color: #333;">
+            <input type="password" id="loginPassword" placeholder="Password" style="margin: 5px; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9); color: #333;">
+            <button onclick="login()" style="margin: 5px; padding: 10px 20px; background: #FFD700; color: #333; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Login</button>
+        </div>
+
+        <div id="registerForm" style="display: none; margin-top: 20px;">
+            <input type="text" id="regUsername" placeholder="Username" style="margin: 5px; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9); color: #333;">
+            <input type="email" id="regEmail" placeholder="Email" style="margin: 5px; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9); color: #333;">
+            <input type="password" id="regPassword" placeholder="Password" style="margin: 5px; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9); color: #333;">
+            <button onclick="register()" style="margin: 5px; padding: 10px 20px; background: #FFD700; color: #333; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Register</button>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent" style="display: none;">
+        <div class="music-generator" id="generate">
+            <h2 style="margin-bottom: 25px; color: #FFD700;">🎶 Create Your Raag</h2>
+
+            <div class="form-group">
+                <label for="raagSelect">Select Raag:</label>
+                <select id="raagSelect">
+                    <option value="yaman">Yaman (Peaceful Evening)</option>
+                    <option value="bhairav">Bhairav (Devotional Morning)</option>
+                    <option value="kafi">Kafi (Romantic Night)</option>
+                    <option value="darbari">Darbari (Serious Night)</option>
+                    <option value="malkauns">Malkauns (Mystical Night)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="titleInput">Title:</label>
+                <input type="text" id="titleInput" placeholder="My Beautiful Raag" />
+            </div>
+
+            <div class="form-group">
+                <label for="tempoSlider">Tempo (BPM): <span class="slider-value" id="tempoValue">120</span></label>
+                <div class="slider-container">
+                    <input type="range" id="tempoSlider" class="slider" min="60" max="180" value="120" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="intensitySlider">Intensity: <span class="slider-value" id="intensityValue">5</span></label>
+                <div class="slider-container">
+                    <input type="range" id="intensitySlider" class="slider" min="1" max="10" value="5" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="moodSelect">Mood:</label>
+                <select id="moodSelect">
+                    <option value="peaceful">Peaceful</option>
+                    <option value="energetic">Energetic</option>
+                    <option value="romantic">Romantic</option>
+                    <option value="devotional">Devotional</option>
+                    <option value="mystical">Mystical</option>
+                </select>
+            </div>
+
+            <button class="generate-btn" id="generateBtn" onclick="generateMusic()">
+                🎵 Generate My Raag!
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Creating your musical masterpiece...</p>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+
+            <div class="audio-player" id="audioPlayer" style="display: none;">
+                <h3>🎼 Your Generated Music</h3>
+                <audio id="audioElement" controls>
+                    Your browser does not support the audio element.
+                </audio>
+                <p id="compositionInfo" style="margin-top: 10px; opacity: 0.8;"></p>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <h2 style="margin-bottom: 20px; color: #FFD700;">🤖 Music Assistant</h2>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-content">
+                        Hello! I'm your music assistant. Ask me about raags, music theory, or how to create beautiful compositions!
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about raags, tempo, or music theory..." onkeypress="handleChatKeyPress(event)">
+                <button class="chat-send-btn" onclick="sendChatMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Swar.AI</h3>
+            <ul>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">How it Works</a></li>
+                <li><a href="#">Pricing</a></li>
+                <li><a href="#">Careers</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h3>Support</h3>
+            <ul>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#">Feedback</a></li>
+                <li><a href="#">Report Bug</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h3>Legal</h3>
+            <ul>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Cookie Policy</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="social-links">
+                <a href="https://facebook.com" title="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="https://twitter.com" title="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://instagram.com" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://linkedin.com" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://youtube.com" title="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        © 2025 Swar.AI. All rights reserved.
+    </div>
+</footer>
+<script>
+    const API_BASE = 'http://127.0.0.1:5000/api';
+    let authToken = localStorage.getItem('authToken');
+    let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+        if (authToken && currentUser) {
+            showMainContent();
+        }
+
+
+        // Set up slider updates
+        document.getElementById('tempoSlider').addEventListener('input', function() {
+            document.getElementById('tempoValue').textContent = this.value;
+        });
+
+        document.getElementById('intensitySlider').addEventListener('input', function() {
+            document.getElementById('intensityValue').textContent = this.value;
+        });
+    });
+
+    function showLoginForm() {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+    }
+
+    function showRegisterForm() {
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+    }
+
+    function showMainContent() {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'grid';
+    }
+
+    async function register() {
+        const username = document.getElementById('regUsername').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+
+        if (!username || !email || !password) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                authToken = data.access_token;
+                currentUser = data.user;
+                localStorage.setItem('authToken', authToken);
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showMainContent();
+                showSuccess('Registration successful! Welcome to Swar.AI!');
+            } else {
+                showError(data.error || 'Registration failed');
+            }
+        } catch (error) {
+            showError('Network error. Please check if the server is running.');
+        }
+    }
+
+    async function login() {
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+
+        if (!username || !password) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                authToken = data.access_token;
+                currentUser = data.user;
+                localStorage.setItem('authToken', authToken);
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showMainContent();
+                showSuccess(`Welcome back, ${currentUser.username}!`);
+            } else {
+                showError(data.error || 'Login failed');
+            }
+        } catch (error) {
+            showError('Network error. Please check if the server is running.');
+        }
+    }
+
+    async function generateMusic() {
+        if (!authToken) {
+            showError('Please login first');
+            return;
+        }
+
+        const title = document.getElementById('titleInput').value || 'My Composition';
+        const raag = document.getElementById('raagSelect').value;
+        const tempo = parseInt(document.getElementById('tempoSlider').value);
+        const intensity = parseInt(document.getElementById('intensitySlider').value);
+        const mood = document.getElementById('moodSelect').value;
+
+        // Show loading
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('generateBtn').disabled = true;
+        document.getElementById('errorMessage').style.display = 'none';
+        document.getElementById('audioPlayer').style.display = 'none';
+
+        try {
+            const response = await fetch(`${API_BASE}/generate-music`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    title,
+                    raag,
+                    tempo,
+                    intensity,
+                    mood
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Update user info
+                currentUser = { ...currentUser, ...data.user };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                // Show audio player
+                const audioElement = document.getElementById('audioElement');
+                audioElement.src = `${API_BASE.replace('/api', '')}/api/audio/${data.composition.filename}`;
+
+                document.getElementById('compositionInfo').innerHTML = `
+                        <strong>${data.composition.title}</strong><br>
+                        Raag: ${data.composition.raag} | Tempo: ${data.composition.tempo} BPM | Intensity: ${data.composition.intensity}<br>
+                        Level: ${currentUser.level} | Experience: ${currentUser.experience}
+                    `;
+
+                document.getElementById('audioPlayer').style.display = 'block';
+                showSuccess('Music generated successfully! 🎵');
+            } else {
+                showError(data.error || 'Failed to generate music');
+            }
+        } catch (error) {
+            showError('Network error. Please check if the server is running.');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('generateBtn').disabled = false;
+        }
+    }
+
+    async function sendChatMessage() {
+        const chatInput = document.getElementById('chatInput');
+        const message = chatInput.value.trim();
+
+        if (!message) return;
+
+        // Add user message to chat
+        addMessageToChat('user', message);
+        chatInput.value = '';
+
+        try {
+            const response = await fetch(`${API_BASE}/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                addMessageToChat('bot', data.response);
+            } else {
+                addMessageToChat('bot', 'Sorry, I encountered an error. Please try again.');
+            }
+        } catch (error) {
+            addMessageToChat('bot', 'Network error. Please check if the server is running.');
+        }
+    }
+
+    function addMessageToChat(sender, message) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        messageDiv.innerHTML = `<div class="message-content">${message}</div>`;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleChatKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendChatMessage();
+        }
+    }
+
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    function showSuccess(message) {
+        const successDiv = document.getElementById('successMessage');
+        successDiv.textContent = message;
+        successDiv.style.display = 'block';
+        setTimeout(() => {
+            successDiv.style.display = 'none';
+        }, 5000);
+    }
+</script>
+</body>
+</html>
